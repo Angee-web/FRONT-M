@@ -12,6 +12,15 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
     }
   }, [isAuthenticated, location.pathname]);
 
+  useEffect(() => {
+    console.log("isAuthenticated:", isAuthenticated);
+    console.log("location.pathname:", location.pathname);
+    if (!isAuthenticated) {
+      localStorage.setItem("lastAttemptedUrl", location.pathname);
+    }
+  }, [isAuthenticated, location.pathname]);
+
+
   // Check for unauthenticated access to protected routes
   if (
     !isAuthenticated &&

@@ -5,6 +5,12 @@ import { useSelector } from "react-redux";
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
+  if (!isAuthenticated) {
+    console.log("Accessing route:", window.location.pathname);
+    console.log("Redirecting to login...");
+  }
+
+
   // Redirect unauthenticated users
  if (!isAuthenticated) {
    const currentRoute = window.location.pathname;
@@ -29,6 +35,7 @@ const ProtectedRoute = ({ children }) => {
      return <Navigate to="/auth/login" replace />;
    }
  }
+
 
   return children; // Render the child components if authenticated
 };
