@@ -1,0 +1,10 @@
+//I got the instruction from shacdn doc
+
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
