@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ScrollToTop from "./pages/ScrollToTop";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import LandingPage from "./pages/landing-page/LandingPage";
+import Dashboard from './pages/Dashboard';
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -37,9 +38,17 @@ const App = () => {
       <Routes>
         {/* Public Landing Page */}
         <Route path="/" element={<LandingPage />} />
+        
 
         {/* Other routes */}
-        <Route path="/*" element={<Dashboard />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/therapy/*" element={<TherapyDashboard />} />
         <Route
           path="/auth/*"
