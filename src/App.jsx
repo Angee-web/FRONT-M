@@ -14,6 +14,7 @@ import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import ScrollToTop from "./pages/ScrollToTop";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import LandingPage from "./pages/landing-page/LandingPage";
 
 const App = () => {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -34,6 +35,7 @@ const App = () => {
     <div className="flex flex-col overflow-hidden">
       <ScrollToTop />
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/*" element={<Dashboard />} />
 
         {/* Public Therapy Landing Page Route */}
