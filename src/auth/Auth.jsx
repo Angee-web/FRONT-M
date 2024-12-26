@@ -6,12 +6,13 @@ import ForgotPassword from './ForgotPassword'
 import Otp from './Otp'
 import Reset from './Reset'
 import Confirm from './Confirm'
+import LandingPage from '@/pages/landing-page/LandingPage'
 
 const Auth = () => {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Navigate to="/auth/login" />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
