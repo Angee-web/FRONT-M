@@ -2,9 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import * as jwt_decode from "jwt-decode";
 
-// Hardcoded API Base URL
-const API_BASE_URL = "https://server-xbzz.onrender.com/api";
-
 // Initial state
 const initialState = {
   isAuthenticated: false,
@@ -38,9 +35,13 @@ export const registerUser = createAsyncThunk(
   "/auth/register",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/register`, formData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "https://server-xbzz.onrender.com/api/auth/register",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -55,7 +56,10 @@ export const loginUser = createAsyncThunk(
   "/auth/login",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, formData);
+      const response = await axios.post(
+        "https://server-xbzz.onrender.com/api/auth/login",
+        formData
+      );
       localStorage.setItem("token", response.data.token); // Store token on login
       return response.data;
     } catch (error) {
@@ -71,9 +75,13 @@ export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "https://server-xbzz.onrender.com/api/auth/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
       localStorage.removeItem("token"); // Clear token on logout
       return response.data;
     } catch (error) {
@@ -89,13 +97,16 @@ export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/auth/check-auth`, {
-        withCredentials: true,
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Expires: 0,
-        },
-      });
+      const response = await axios.get(
+        "https://server-xbzz.onrender.com/api/auth/check-auth",
+        {
+          withCredentials: true,
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Expires: 0,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -115,7 +126,7 @@ export const forgotPassword = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/auth/forgot-password`,
+        "https://server-xbzz.onrender.com/api/auth/forgot-password",
         { email },
         { withCredentials: true }
       );
@@ -135,11 +146,10 @@ export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async ({ email, otp, newPassword }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
-        email,
-        otp,
-        newPassword,
-      });
+      const response = await axios.post(
+        "https://server-xbzz.onrender.com/api/auth/reset-password",
+        { email, otp, newPassword }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -155,7 +165,7 @@ export const verifyOtp = createAsyncThunk(
   async ({ email, otp }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/auth/verify-otp`,
+        "https://server-xbzz.onrender.com/api/auth/verify-otp",
         { email, otp },
         { withCredentials: true }
       );
