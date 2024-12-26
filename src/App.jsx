@@ -35,12 +35,12 @@ const App = () => {
     <div className="flex flex-col overflow-hidden">
       <ScrollToTop />
       <Routes>
+        {/* Public Landing Page */}
         <Route path="/" element={<LandingPage />} />
+
+        {/* Other routes */}
         <Route path="/*" element={<Dashboard />} />
-
-        {/* Public Therapy Landing Page Route */}
         <Route path="/therapy/*" element={<TherapyDashboard />} />
-
         <Route
           path="/auth/*"
           element={
@@ -55,21 +55,16 @@ const App = () => {
             <CheckAuth isAuthenticated={isAuthenticated} user={user}>
               <Admin />
             </CheckAuth>
-            // <Admin />
           }
         />
         <Route
           path="/shop/*"
           element={
             <ProtectedRoute>
-               <CheckAuth isAuthenticated={isAuthenticated} user={user}>
               <Shopping />
-            </CheckAuth>
             </ProtectedRoute>
-           
           }
         />
-
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

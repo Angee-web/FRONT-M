@@ -1,88 +1,57 @@
 import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-
 const CheckAuth = ({ isAuthenticated, user, children }) => {
   const location = useLocation();
 
-  // UseEffect to save the last attempted URL for unauthenticated users
+  // Save the last attempted URL for unauthenticated users
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && location.pathname !== "/auth/login") {
       localStorage.setItem("lastAttemptedUrl", location.pathname);
     }
   }, [isAuthenticated, location.pathname]);
 
-  useEffect(() => {
-    console.log("isAuthenticated:", isAuthenticated);
-    console.log("location.pathname:", location.pathname);
-    if (!isAuthenticated) {
-      localStorage.setItem("lastAttemptedUrl", location.pathname);
-    }
-  }, [isAuthenticated, location.pathname]);
+  // Handle unauthenticated users trying to access protected routes
+  const protectedRoutes = [
+    "/admin",
+    "/shop",
+    "/therapy",
+    // Add other protected routes here
+  ];
 
-
-  // Check for unauthenticated access to protected routes
   if (
     !isAuthenticated &&
-    ![
-      "/", // Home page (keep public)
-      "/auth/login",
-      "/auth/register",
-      "/auth/forgot-password",
-      "/auth/input-otp",
-      "/auth/reset-password",
-      "/auth/confirm-reset",
-    ].includes(location.pathname)
+    protectedRoutes.some((path) => location.pathname.startsWith(path))
   ) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // Handle authenticated access
+  // Redirect authenticated users away from auth-related pages
   if (isAuthenticated) {
-    // Redirect authenticated users away from authentication pages
-    if (
-      [
-        "/",
-        "/auth/login",
-        "/auth/register",
-        "/auth/forgot-password",
-        "/auth/input-otp",
-        "/auth/reset-password",
-        "/auth/confirm-reset",
-      ].includes(location.pathname)
-    ) {
-      const lastAttemptedURL = localStorage.getItem("lastAttemptedURL");
+    if (location.pathname.startsWith("/auth")) {
+      const lastAttemptedURL = localStorage.getItem("lastAttemptedUrl");
       if (user?.role === "admin") {
-        return <Navigate to="/admin/dashboard" />;
-      } else {
-        return <Navigate to={lastAttemptedURL || "/therapy"} replace />;
+        return <Navigate to="/admin/dashboard" replace />;
       }
+      return <Navigate to={lastAttemptedURL || "/therapy"} replace />;
+    }
+
+    // Restrict non-admin users from admin routes
+    if (user?.role !== "admin" && location.pathname.startsWith("/admin")) {
+      return <Navigate to="/unauth-page" replace />;
+    }
+
+    // Restrict admin users from non-admin routes
+    if (user?.role === "admin" && !location.pathname.startsWith("/admin")) {
+      return <Navigate to="/admin/dashboard" replace />;
     }
   }
 
-  // Check if a non-admin user is trying to access admin pages
-  if (
-    isAuthenticated &&
-    user?.role !== "admin" &&
-    location.pathname.includes("/admin")
-  ) {
-    return <Navigate to="/unauth-page" />;
-  }
-
-  // Check if an admin user is trying to access non-admin pages
-  if (
-    isAuthenticated &&
-    user?.role === "admin" &&
-    location.pathname.includes("/therapy")
-  ) {
-    return <Navigate to="/admin/dashboard" />;
-  }
-
+  // Allow access to public and protected content
   return <div>{children}</div>;
 };
 
 export default CheckAuth;
-
 
 // import React, { useEffect } from "react";
 // import { Navigate, useLocation } from "react-router-dom";

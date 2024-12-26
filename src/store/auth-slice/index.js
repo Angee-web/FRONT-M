@@ -89,27 +89,21 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-// Check if user is authenticated
 export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/auth/check-auth`,  {
+      const response = await api.get(`/auth/check-auth`, {
         withCredentials: true,
         headers: {
-       
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Expires: 0,
         },
       });
-    
       return response.data;
     } catch (error) {
+      // Return a rejected value instead of forcing a redirect
       if (error.response && error.response.status === 401) {
-        // Redirect to login page if not already redirected
-        if (window.location.pathname !== "/auth/login") {
-          window.location.href = "/auth/login"; // Match your login route
-        }
         return rejectWithValue("Unauthorized");
       }
       return rejectWithValue(error.message || "Something went wrong");
