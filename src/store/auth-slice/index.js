@@ -1,7 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import api from "../auth-slice/api"; // Use the custom Axios instance
 import * as jwt_decode from "jwt-decode";
+
+// Hardcoded API Base URL
+const API_BASE_URL = "https://server-xbzz.onrender.com/api";
 
 // Initial state
 const initialState = {
@@ -9,9 +11,6 @@ const initialState = {
   isLoading: true,
   user: null,
 };
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-console.log("API_BASE_URL", API_BASE_URL);
 
 // Helper function to initialize state
 const initializeAuthState = () => {
@@ -34,13 +33,12 @@ const initializeAuthState = () => {
   return { ...initialState, isLoading: false }; // Default to unauthenticated state
 };
 
-
 // Register user
 export const registerUser = createAsyncThunk(
   "/auth/register",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/auth/register`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/auth/register`, formData, {
         withCredentials: true,
       });
       return response.data;
@@ -57,9 +55,8 @@ export const loginUser = createAsyncThunk(
   "/auth/login",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/auth/login`, formData);
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, formData);
       localStorage.setItem("token", response.data.token); // Store token on login
-
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -74,11 +71,9 @@ export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        `/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
+        withCredentials: true,
+      });
       localStorage.removeItem("token"); // Clear token on logout
       return response.data;
     } catch (error) {
@@ -94,19 +89,16 @@ export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/auth/check-auth`,  {
+      const response = await axios.get(`${API_BASE_URL}/auth/check-auth`, {
         withCredentials: true,
         headers: {
-       
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Expires: 0,
         },
       });
-    
       return response.data;
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        // Redirect to login page if not already redirected
         if (window.location.pathname !== "/auth/login") {
           window.location.href = "/auth/login"; // Match your login route
         }
@@ -122,8 +114,8 @@ export const forgotPassword = createAsyncThunk(
   "/auth/forgot-password",
   async (email, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        `/auth/forgot-password`,
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/forgot-password`,
         { email },
         { withCredentials: true }
       );
@@ -143,7 +135,7 @@ export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async ({ email, otp, newPassword }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/auth/reset-password`, {
+      const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
         email,
         otp,
         newPassword,
@@ -162,8 +154,8 @@ export const verifyOtp = createAsyncThunk(
   "/auth/verify-otp",
   async ({ email, otp }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        `/auth/verify-otp`,
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/verify-otp`,
         { email, otp },
         { withCredentials: true }
       );
@@ -195,7 +187,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Register user cases
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -209,8 +200,6 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       })
-
-      // Login user cases
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -224,8 +213,6 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       })
-
-      // Check auth cases
       .addCase(checkAuth.pending, (state) => {
         state.isLoading = true;
       })
@@ -239,54 +226,14 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
       })
-
-      // Logout user cases
       .addCase(logoutUser.fulfilled, (state) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
-      })
-      .addCase(forgotPassword.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(forgotPassword.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.message = action.payload.message; // Optional: Save success message
-      })
-      .addCase(forgotPassword.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload; // Optional: Save error message
-      })
-
-      // Reset Password cases
-      .addCase(resetPassword.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(resetPassword.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.message = action.payload.message; // Optional: Save success message
-      })
-      .addCase(resetPassword.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload; // Optional: Save error message
-      })
-      .addCase(verifyOtp.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(verifyOtp.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.message = action.payload.message; // Save success message
-        state.isOtpVerified = true; // Optional: Add a flag to track OTP verification
-      })
-      .addCase(verifyOtp.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload; // Save error details
-        state.isOtpVerified = false;
       });
   },
 });
 
-export const { setUser, setIntendedRoute, clearIntendedRoute } =
-  authSlice.actions;
+export const { setUser, clearAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
