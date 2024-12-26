@@ -11,11 +11,9 @@ console.log("API_BASE_URL", API_BASE_URL);
 
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`, // Base URL for API requests
-  headers: {
-    "Content-Type": "application/json", // Default header for JSON requests
-  },
-  withCredentials: true, // Include cookies and sessions
+  baseURL: "https://server-xbzz.onrender.com/api",
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true, // Include cookies in requests
 });
 
 // Request Interceptor: Automatically attach the token to headers
