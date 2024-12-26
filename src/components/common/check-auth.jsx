@@ -16,6 +16,7 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
   if (
     !isAuthenticated &&
     ![
+      "/", // Home page
       "/auth/login",
       "/auth/register",
       "/auth/forgot-password",
@@ -32,6 +33,7 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
     // Redirect authenticated users away from authentication pages
     if (
       [
+        "/",
         "/auth/login",
         "/auth/register",
         "/auth/forgot-password",
