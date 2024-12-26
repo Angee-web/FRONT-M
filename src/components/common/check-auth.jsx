@@ -16,16 +16,16 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
   if (
     !isAuthenticated &&
     ![
-      "/", // Home page
+      "/", // Home page (keep public)
       "/auth/login",
       "/auth/register",
       "/auth/forgot-password",
       "/auth/input-otp",
       "/auth/reset-password",
       "/auth/confirm-reset",
-    ].includes(location.pathname) // Use exact path matching
+    ].includes(location.pathname)
   ) {
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/auth/login" replace />;
   }
 
   // Handle authenticated access
